@@ -1,0 +1,6 @@
+@RepairCenter.Web_HostAddress = http://localhost:5233
+
+GET {{RepairCenter.Web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
