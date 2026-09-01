@@ -107,7 +107,18 @@ namespace RepairCenter.Web
 
 
 
-            builder.Services.AddSignalR();
+           
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
 
             builder.Services.AddScoped<
                 INotificationSender,
@@ -158,14 +169,15 @@ namespace RepairCenter.Web
             }
 
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
+           
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+            
 
             app.UseHttpsRedirection();
+          
+
+            app.UseCors("AllowFrontend");
 
 
             app.UseAuthentication();
@@ -175,22 +187,7 @@ namespace RepairCenter.Web
             app.MapHub<NotificationHub>("/notificationHub");
 
 
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var services = scope.ServiceProvider;
-            //    try
-            //    {
-            //        var context = services.GetRequiredService<AppDbContext>();
-
-            //        await context.Database.MigrateAsync();
-
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        var logger = services.GetRequiredService<ILogger<Program>>();
-            //        logger.LogError(ex, "мок ньц");
-            //    }
-            //}
+          
             app.Run();
         }
     }
