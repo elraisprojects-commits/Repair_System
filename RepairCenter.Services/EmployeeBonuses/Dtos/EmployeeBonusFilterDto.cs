@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 
 namespace RepairCenter.Services.EmployeeBonuses.Dtos
 {
+
     public class EmployeeBonusFilterDto
     {
         public string? EmployeeId { get; set; }
 
+        public DateTime? Date { get; set; }
+
         public int? Month { get; set; }
 
         public int? Year { get; set; }
+
+        public DateTime? FromDate { get; set; }
+
+        public DateTime? ToDate { get; set; }
     }
+
 }

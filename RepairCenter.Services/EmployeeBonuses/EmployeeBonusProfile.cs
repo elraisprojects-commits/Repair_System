@@ -9,11 +9,12 @@ using System.Threading.Tasks;
 
 namespace RepairCenter.Services.EmployeeBonuses
 {
+   
+
     public class EmployeeBonusProfile : Profile
     {
         public EmployeeBonusProfile()
         {
-            // Add Bonus
             CreateMap<AddEmployeeBonusDto, EmployeeBonus>()
                 .ForMember(dest => dest.Id,
                     opt => opt.Ignore())
@@ -27,27 +28,19 @@ namespace RepairCenter.Services.EmployeeBonuses
                 .ForMember(dest => dest.CreatedById,
                     opt => opt.Ignore())
 
-                .ForMember(dest => dest.Month,
-                    opt => opt.Ignore())
-
-                .ForMember(dest => dest.Year,
-                    opt => opt.Ignore())
-
                 .ForMember(dest => dest.CreatedAt,
                     opt => opt.Ignore());
 
-
-
-            
             CreateMap<EmployeeBonus, EmployeeBonusDto>()
-
                 .ForMember(dest => dest.EmployeeName,
-                    opt => opt.MapFrom(src =>
-                        src.Employee.FullName))
+                    opt => opt.MapFrom(src => src.Employee.FullName))
 
                 .ForMember(dest => dest.CreatedBy,
+                    opt => opt.MapFrom(src => src.CreatedBy.FullName))
+
+                .ForMember(dest => dest.NetAmount,
                     opt => opt.MapFrom(src =>
-                        src.CreatedBy.FullName));
+                        src.BonusAmount - src.DeductionAmount));
         }
     }
 }

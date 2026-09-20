@@ -12,95 +12,140 @@ namespace RepairCenter.Web.Controllers
     [Authorize(Roles = "Admin")]
     public class EmployeeBonusController : ControllerBase
     {
-        private readonly IEmployeeBonusService _employeeBonusService;
+        private readonly IEmployeeBonusService _service;
 
         public EmployeeBonusController(
-            IEmployeeBonusService employeeBonusService)
+            IEmployeeBonusService service)
         {
-            _employeeBonusService = employeeBonusService;
+            _service = service;
         }
 
-        #region Add Bonus
+
+      
+        // ADD BONUS + DEDUCTION
+      
 
         [HttpPost]
-        public async Task<IActionResult> AddBonus(
-            AddEmployeeBonusDto dto)
+        public async Task<IActionResult> Add(
+            [FromBody] AddEmployeeBonusDto dto)
         {
-            var adminId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            await _employeeBonusService.AddBonusAsync(
-                dto,
-                adminId!);
-
-            return Ok(new
+            try
             {
-                Message = "Bonus added successfully."
-            });
+                var adminId =
+                    User.FindFirstValue(
+                        ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(adminId))
+                    return Unauthorized();
+
+
+                var result =
+                    await _service.AddAsync(
+                        dto,
+                        adminId);
+
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
         }
 
-        #endregion
 
-
-
-        #region Get All
+        
+        // GET ALL
+       
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var result = await _employeeBonusService.GetAllAsync();
+            var result =
+                await _service.GetAllAsync();
 
             return Ok(result);
         }
 
-        #endregion
 
-
-
-        #region Get Employee Bonuses
+   
+        // GET EMPLOYEE
+        
 
         [HttpGet("employee/{employeeId}")]
-        public async Task<IActionResult> GetEmployeeBonuses(
-            string employeeId)
+        public async Task<IActionResult>
+            GetEmployee(string employeeId)
         {
-            var result = await _employeeBonusService
-                .GetEmployeeBonusesAsync(employeeId);
+            try
+            {
+                var result =
+                    await _service
+                        .GetEmployeeBonusesAsync(
+                            employeeId);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
+
+      
+
+        [HttpGet("filter")]
+        public async Task<IActionResult>
+            Filter([FromQuery] EmployeeBonusFilterDto filter)
+        {
+            var result =
+                await _service.FilterAsync(filter);
 
             return Ok(result);
         }
 
-        #endregion
 
+     
 
-
-        #region Filter
-
-        [HttpPost("filter")]
-        public async Task<IActionResult> Filter(
-            EmployeeBonusFilterDto filter)
+        [HttpGet("summary")]
+        public async Task<IActionResult>
+            Summary([FromQuery] EmployeeBonusFilterDto filter)
         {
-            var result = await _employeeBonusService
-                .FilterAsync(filter);
+            var result =
+                await _service.GetSummaryAsync(filter);
 
             return Ok(result);
         }
 
-        #endregion
 
-
-
-        #region Delete
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult>
+            Delete(int id)
         {
-            await _employeeBonusService.DeleteAsync(id);
-
-            return Ok(new
+            try
             {
-                Message = "Bonus deleted successfully."
-            });
-        }
+                await _service.DeleteAsync(id);
 
-        #endregion
+                return Ok(new
+                {
+                    message =
+                        "Transaction deleted successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
     }
 }

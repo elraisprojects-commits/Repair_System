@@ -10,7 +10,9 @@ namespace RepairCenter.Services.EmployeeBonuses.Dtos
     {
         public string EmployeeId { get; set; } = null!;
 
-        public decimal Amount { get; set; }
+        public decimal BonusAmount { get; set; }
+
+        public decimal DeductionAmount { get; set; }
 
         public string? Reason { get; set; }
     }

@@ -41,14 +41,14 @@ namespace RepairCenter.data.Seed
                 context.Branches.AddRange(
                     new Branch
                     {
-                        Name = "Main Branch",
-                        Address = "Giza"
+                        Name = "dokki"
+                      
                     },
                     
                     new Branch
                     {
-                        Name = "Second Branch",
-                        Address = "Maadi"
+                        Name = "nasr city"
+                       
                     });
 
                 await context.SaveChangesAsync();

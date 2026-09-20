@@ -72,7 +72,7 @@ namespace RepairCenter.Services.EmployeeReports
                 employeeDto.Role =
                     roles.FirstOrDefault() ?? "";
 
-                // فلترة بالوظيفة
+                
                 if (!string.IsNullOrWhiteSpace(dto.Role))
                 {
                     if (!employeeDto.Role.Equals(
@@ -138,7 +138,7 @@ namespace RepairCenter.Services.EmployeeReports
                 employeeDto.TotalBonus =
                     await _context.EmployeeBonuses
                         .Where(x => x.EmployeeId == employee.Id)
-                        .SumAsync(x => x.Amount);
+                        .SumAsync(x => x.BonusAmount);
 
                 response.Employees.Add(employeeDto);
             }

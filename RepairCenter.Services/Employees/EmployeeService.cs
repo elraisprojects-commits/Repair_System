@@ -310,17 +310,16 @@ namespace RepairCenter.Services.Employees
             var currentMonthBonus = await _context.EmployeeBonuses
 
                 .Where(x =>
-                    x.EmployeeId == id &&
-                    x.Month == currentMonth &&
-                    x.Year == currentYear)
+                    x.EmployeeId == id )
+                 
 
-                .SumAsync(x => (decimal?)x.Amount) ?? 0;
+                .SumAsync(x => (decimal?)x.BonusAmount) ?? 0;
 
             var totalBonus = await _context.EmployeeBonuses
 
                 .Where(x => x.EmployeeId == id)
 
-                .SumAsync(x => (decimal?)x.Amount) ?? 0;
+                .SumAsync(x => (decimal?)x.BonusAmount) ?? 0;
 
             var lastBonus = await _context.EmployeeBonuses
 

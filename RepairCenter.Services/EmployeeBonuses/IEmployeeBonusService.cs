@@ -9,23 +9,21 @@ namespace RepairCenter.Services.EmployeeBonuses
 {
     public interface IEmployeeBonusService
     {
-        // Add Bonus
-        Task AddBonusAsync(
+        Task<EmployeeBonusDto> AddAsync(
             AddEmployeeBonusDto dto,
             string adminId);
 
-        // Get All Bonuses
         Task<List<EmployeeBonusDto>> GetAllAsync();
 
-        // Get Employee Bonuses
         Task<List<EmployeeBonusDto>> GetEmployeeBonusesAsync(
             string employeeId);
 
-        // Filter
         Task<List<EmployeeBonusDto>> FilterAsync(
             EmployeeBonusFilterDto filter);
 
-        // Delete Bonus
+        Task<EmployeeBonusSummaryDto> GetSummaryAsync(
+            EmployeeBonusFilterDto filter);
+
         Task DeleteAsync(int id);
     }
 }
