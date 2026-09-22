@@ -37,6 +37,10 @@ namespace RepairCenter.Services.Employees
         Task<EmployeeProfileDto> GetProfileAsync(string id);
 
         Task<List<EmployeeListDto>> FilterAsync(
+          
             EmployeeFilterDto filter);
+
+
+        Task DeleteAsync(string id);
     }
 }

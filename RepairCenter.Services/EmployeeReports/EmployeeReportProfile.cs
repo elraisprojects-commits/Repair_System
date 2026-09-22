@@ -30,10 +30,9 @@ namespace RepairCenter.Services.EmployeeReports
                             ? src.Branch.Name
                             : null))
 
-                .ForMember(dest => dest.Salary,
+                .ForMember(dest => dest.BasicSalary,
                     opt => opt.MapFrom(src => src.Salary))
 
-               
                 .ForMember(dest => dest.Role,
                     opt => opt.Ignore())
 
@@ -53,6 +52,12 @@ namespace RepairCenter.Services.EmployeeReports
                     opt => opt.Ignore())
 
                 .ForMember(dest => dest.TotalBonus,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.TotalDeduction,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.NetSalary,
                     opt => opt.Ignore());
         }
     }

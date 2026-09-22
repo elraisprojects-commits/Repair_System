@@ -28,8 +28,15 @@ namespace RepairCenter.Services.EmployeeReports.Dtos
 
         public decimal TotalRevenue { get; set; }
 
+       
+
+        // Salary
+        public decimal BasicSalary { get; set; }
+
         public decimal TotalBonus { get; set; }
 
-        public decimal Salary { get; set; }
+        public decimal TotalDeduction { get; set; }
+
+        public decimal NetSalary { get; set; }
     }
 }

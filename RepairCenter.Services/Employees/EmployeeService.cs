@@ -426,7 +426,28 @@ namespace RepairCenter.Services.Employees
 
         #endregion
 
+        #region Delete
 
+        public async Task DeleteAsync(string id)
+        {
+            var employee = await _userManager
+                .FindByIdAsync(id);
+
+            if (employee == null)
+                throw new Exception("Employee not found.");
+
+            var result = await _userManager
+                .DeleteAsync(employee);
+
+            if (!result.Succeeded)
+            {
+                throw new Exception(
+                    string.Join(Environment.NewLine,
+                        result.Errors.Select(x => x.Description)));
+            }
+        }
+
+        #endregion
         public async Task<List<EmployeeListDto>> FilterAsync(
            EmployeeFilterDto filter)
         {

@@ -83,7 +83,7 @@ namespace RepairCenter.Web.Controllers
 
         #endregion
 
-
+    
 
         #region My Profile
 
@@ -158,7 +158,16 @@ namespace RepairCenter.Web.Controllers
 
         #endregion
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            await _employeeService.DeleteAsync(id);
 
+            return Ok(new
+            {
+                message = "Employee deleted successfully."
+            });
+        }
 
         #region Change Role
 

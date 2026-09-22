@@ -53,26 +53,34 @@ namespace RepairCenter.Services.EmployeeReports
             if (dto.BranchId.HasValue)
             {
                 employeesQuery = employeesQuery.Where(x =>
-                    x.BranchId == dto.BranchId);
+                    x.BranchId == dto.BranchId.Value);
             }
 
-            var employees = await employeesQuery.ToListAsync();
+            var employees =
+                await employeesQuery.ToListAsync();
 
-            var response = new EmployeeReportResponseDto();
+            var response =
+                new EmployeeReportResponseDto();
 
             foreach (var employee in employees)
             {
                 var employeeDto =
                     _mapper.Map<EmployeePerformanceDto>(employee);
 
+                // ==========================
                 // Role
+                // ==========================
+
                 var roles =
                     await _userManager.GetRolesAsync(employee);
 
                 employeeDto.Role =
                     roles.FirstOrDefault() ?? "";
 
-                
+                // ==========================
+                // Role Filter
+                // ==========================
+
                 if (!string.IsNullOrWhiteSpace(dto.Role))
                 {
                     if (!employeeDto.Role.Equals(
@@ -88,23 +96,31 @@ namespace RepairCenter.Services.EmployeeReports
                 // ==========================
 
                 var requests = _context.ServiceRequests
-                    .Where(x => x.SpecialistId == employee.Id)
+                    .Where(x =>
+                        x.SpecialistId == employee.Id)
                     .AsQueryable();
 
                 if (dto.FromDate.HasValue)
                 {
+                    var fromDate =
+                        dto.FromDate.Value.Date;
+
                     requests = requests.Where(x =>
-                        x.CreatedAt.Date >= dto.FromDate.Value.Date);
+                        x.CreatedAt >= fromDate);
                 }
 
                 if (dto.ToDate.HasValue)
                 {
+                    var toDate =
+                        dto.ToDate.Value.Date.AddDays(1);
+
                     requests = requests.Where(x =>
-                        x.CreatedAt.Date <= dto.ToDate.Value.Date);
+                        x.CreatedAt < toDate);
                 }
 
+                // ==========================
                 // Requests Statistics
-              
+                // ==========================
 
                 employeeDto.AssignedRequests =
                     await requests.CountAsync();
@@ -122,23 +138,85 @@ namespace RepairCenter.Services.EmployeeReports
                         x.Status == RequestStatus.CompanyRejected ||
                         x.Status == RequestStatus.CancelledByCustomer);
 
-             
+                // ==========================
                 // Revenue
-              
+                // ==========================
 
                 employeeDto.TotalRevenue =
                     await requests
-                        .Where(x => x.Status == RequestStatus.Delivered)
-                        .SumAsync(x => x.Cost ?? 0);
+                        .Where(x =>
+                            x.Status == RequestStatus.Delivered)
+                        .SumAsync(x =>
+                            x.Cost ?? 0);
 
-               
-                // Bonus
-                
+                // ==========================
+                // Bonus + Deduction Query
+                // ==========================
+
+                var transactions =
+                    _context.EmployeeBonuses
+                        .Where(x =>
+                            x.EmployeeId == employee.Id)
+                        .AsQueryable();
+
+                // ==========================
+                // Transaction From Date
+                // ==========================
+
+                if (dto.FromDate.HasValue)
+                {
+                    var fromDate =
+                        dto.FromDate.Value.Date;
+
+                    transactions =
+                        transactions.Where(x =>
+                            x.CreatedAt >= fromDate);
+                }
+
+                // ==========================
+                // Transaction To Date
+                // ==========================
+
+                if (dto.ToDate.HasValue)
+                {
+                    var toDate =
+                        dto.ToDate.Value.Date.AddDays(1);
+
+                    transactions =
+                        transactions.Where(x =>
+                            x.CreatedAt < toDate);
+                }
+
+                // ==========================
+                // Total Bonus
+                // ==========================
 
                 employeeDto.TotalBonus =
-                    await _context.EmployeeBonuses
-                        .Where(x => x.EmployeeId == employee.Id)
-                        .SumAsync(x => x.BonusAmount);
+                    await transactions
+                        .SumAsync(x =>
+                            (decimal?)x.BonusAmount) ?? 0;
+
+                // ==========================
+                // Total Deduction
+                // ==========================
+
+                employeeDto.TotalDeduction =
+                    await transactions
+                        .SumAsync(x =>
+                            (decimal?)x.DeductionAmount) ?? 0;
+
+                // ==========================
+                // Net Salary
+                // ==========================
+
+                employeeDto.NetSalary =
+                    employeeDto.BasicSalary
+                    + employeeDto.TotalBonus
+                    - employeeDto.TotalDeduction;
+
+                // ==========================
+                // Add Employee
+                // ==========================
 
                 response.Employees.Add(employeeDto);
             }
