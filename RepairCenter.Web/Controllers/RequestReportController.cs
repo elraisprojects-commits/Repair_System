@@ -8,7 +8,7 @@ namespace RepairCenter.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   [Authorize(Roles = "Admin")]
+   [Authorize]
     public class RequestReportController : ControllerBase
     {
         private readonly IRequestReportService _requestReportService;

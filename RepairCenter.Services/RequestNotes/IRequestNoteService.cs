@@ -12,5 +12,8 @@ namespace RepairCenter.Services.RequestNotes
         Task AddNoteAsync(
             AddRequestNoteDto dto,
             string userId);
+
+        Task<List<RequestNoteDto>> GetByRequestIdAsync(
+            int requestId);
     }
 }

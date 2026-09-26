@@ -132,14 +132,18 @@ namespace RepairCenter.Services.RequestReports
 
             if (dto.FromDate.HasValue)
             {
+                var fromDate = dto.FromDate.Value.Date;
+
                 query = query.Where(x =>
-                    x.CreatedAt.Date >= dto.FromDate.Value.Date);
+                    x.CreatedAt >= fromDate);
             }
 
             if (dto.ToDate.HasValue)
             {
+                var toDate = dto.ToDate.Value.Date.AddDays(1);
+
                 query = query.Where(x =>
-                    x.CreatedAt.Date <= dto.ToDate.Value.Date);
+                    x.CreatedAt < toDate);
             }
 
             var requests = await query

@@ -38,6 +38,19 @@ namespace RepairCenter.Services.RequestNotes
 
                     .ForMember(x => x.CreatedAt,
                         opt => opt.Ignore());
-            }
+
+
+
+            // Get Note
+            CreateMap<RequestNote, RequestNoteDto>()
+                .ForMember(dest => dest.RequestId,
+                    opt => opt.MapFrom(src => src.ServiceRequestId))
+
+                .ForMember(dest => dest.CreatedBy,
+                    opt => opt.MapFrom(src =>
+                        src.CreatedBy != null
+                            ? src.CreatedBy.FullName
+                            : null));
+        }
         }
   }

@@ -17,7 +17,9 @@ namespace RepairCenter.data.Enums
         InProgress,                            //جاري الاصلاح 
         Completed,                            //تم الانتهاء     
         Delivered,                           //تم الاستلام 
-        CancelledByCustomer                 //تم الرفض من العميل 
+        CancelledByCustomer,                 //تم الرفض من العميل 
+
+        Repricing                           //اعاده التسعير by admin
     }
 }
 

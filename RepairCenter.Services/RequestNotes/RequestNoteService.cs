@@ -29,8 +29,8 @@ namespace RepairCenter.Services.RequestNotes
         }
 
         public async Task AddNoteAsync(
-             AddRequestNoteDto dto,
-             string userId)
+     AddRequestNoteDto dto,
+     string userId)
         {
             var request = await _context.ServiceRequests
                 .FirstOrDefaultAsync(x => x.Id == dto.RequestId);
@@ -38,13 +38,14 @@ namespace RepairCenter.Services.RequestNotes
             if (request == null)
                 throw new Exception("Request not found.");
 
-            if (request.Status != RequestStatus.WaitingCustomerApproval &&
-                request.Status != RequestStatus.InProgress)
+            // لو الطلب لسه مفيش له Specialist
+            // نربطه بأول موظف كتب Note
+            if (string.IsNullOrEmpty(request.SpecialistId))
             {
-                throw new Exception("You cannot update this request.");
+                request.SpecialistId = userId;
             }
 
-           
+            // لو الـ Note جاية معاها Status
             if (dto.Status.HasValue)
             {
                 if (dto.Status != RequestStatus.WaitingCustomerApproval &&
@@ -54,17 +55,8 @@ namespace RepairCenter.Services.RequestNotes
                 {
                     throw new Exception("Invalid Status.");
                 }
-            }
 
-            
-            if (string.IsNullOrEmpty(request.SpecialistId))
-            {
-                request.SpecialistId = userId;
-            }
-
-            
-            if (dto.Status.HasValue)
-            {
+                // تحديث حالة الطلب
                 request.Status = dto.Status.Value;
             }
 
@@ -77,10 +69,11 @@ namespace RepairCenter.Services.RequestNotes
 
             await _context.SaveChangesAsync();
 
-           
+            // ============================
             // Notifications
-           
+            // ============================
 
+            // Note فقط بدون تغيير Status
             if (!dto.Status.HasValue)
             {
                 await _notificationService.CreateForAllEmployeesAsync(
@@ -91,6 +84,7 @@ namespace RepairCenter.Services.RequestNotes
                 return;
             }
 
+            // Status اتغير
             switch (dto.Status.Value)
             {
                 case RequestStatus.InProgress:
@@ -122,5 +116,22 @@ namespace RepairCenter.Services.RequestNotes
                     break;
             }
         }
+
+
+
+        // GET NOTES FOR REQUEST
+        // ============================================
+
+        public async Task<List<RequestNoteDto>> GetByRequestIdAsync(
+            int requestId)
+        {
+            var notes = await _context.RequestNotes
+                .Include(x => x.CreatedBy)
+                .Where(x => x.ServiceRequestId == requestId)
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
+
+            return _mapper.Map<List<RequestNoteDto>>(notes);
+        }
     }
-}
+ }

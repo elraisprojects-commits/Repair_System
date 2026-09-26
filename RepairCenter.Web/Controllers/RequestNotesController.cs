@@ -39,5 +39,15 @@ namespace RepairCenter.Web.Controllers
                 Message = "Request updated successfully."
             });
         }
+
+
+        [HttpGet("request/{requestId}")]
+        public async Task<IActionResult> GetByRequestId(int requestId)
+        {
+            var notes = await _requestNoteService
+                .GetByRequestIdAsync(requestId);
+
+            return Ok(notes);
+        }
     }
 }

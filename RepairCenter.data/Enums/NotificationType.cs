@@ -26,8 +26,11 @@ namespace RepairCenter.data.Enums
 
         RequestCompleted,
 
-        RequestDelivered
+        RequestDelivered,
 
-        
+
+        Repricing
+
+
     }
 }

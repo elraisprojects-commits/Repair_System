@@ -91,6 +91,43 @@ namespace RepairCenter.Services.AdminReview
                    request.Id,
                    request.RequestNumber);
             }
+
+
+
+            public async Task RepriceAsync(
+    RepricingDto dto,
+    string userId)
+            {
+                var request = await _context.ServiceRequests
+                    .FirstOrDefaultAsync(x => x.Id == dto.RequestId);
+
+                if (request == null)
+                    throw new Exception("Request Not Found");
+
+                request.Cost = dto.Cost;
+
+                request.Status = RequestStatus.Repricing;
+
+                if (!string.IsNullOrWhiteSpace(dto.Note))
+                {
+                    var note = new RequestNote
+                    {
+                        ServiceRequestId = request.Id,
+                        Note = dto.Note,
+                        CreatedById = userId,
+                        Status = RequestStatus.Repricing
+                    };
+
+                    _context.RequestNotes.Add(note);
+                }
+
+                await _context.SaveChangesAsync();
+
+                await _notificationService.CreateForAllEmployeesAsync(
+                    NotificationType.Repricing,
+                    request.Id,
+                    request.RequestNumber);
+            }
         }
     }
 }

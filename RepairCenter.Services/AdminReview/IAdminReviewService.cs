@@ -12,6 +12,8 @@ namespace RepairCenter.Services.AdminReview
         Task AdminReviewAsync(AdminReviewDto dto, string userId);
        
         Task RejectByCompanyAsync(CompanyRejectDto dto);
+
+        Task RepriceAsync(RepricingDto dto, string userId);
     }
 }
 

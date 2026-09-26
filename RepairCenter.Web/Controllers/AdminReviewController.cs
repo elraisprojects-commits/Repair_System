@@ -37,7 +37,19 @@ namespace RepairCenter.Web.Controllers
                 Message = "Review Saved Successfully"
             });
         }
+        [HttpPut("repricing")]
+        public async Task<IActionResult> Repricing(
+    RepricingDto dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            await _adminReviewService.RepriceAsync(dto, userId!);
+
+            return Ok(new
+            {
+                message = "Request repriced successfully."
+            });
+        }
 
         [HttpPut("reject")]
         [Authorize(Roles = "Admin")]
