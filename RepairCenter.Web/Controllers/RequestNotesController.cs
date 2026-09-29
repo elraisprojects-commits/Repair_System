@@ -9,7 +9,7 @@ namespace RepairCenter.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Specialist")]
+    [Authorize]
     public class RequestNotesController : ControllerBase
     {
         private readonly IRequestNoteService _requestNoteService;
