@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RepairCenter.data.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,5 +14,7 @@ namespace RepairCenter.Services.AdminReview.Dtos
         public decimal Cost { get; set; }
 
         public string? Note { get; set; }
+
+        public RequestStatus Status { get; set; }
     }
 }

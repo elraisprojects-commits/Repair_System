@@ -18,10 +18,11 @@ namespace RepairCenter.Services.RequestNotes
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly INotificationService _notificationService;
+
         public RequestNoteService(
-    AppDbContext context,
-    IMapper mapper,
-    INotificationService notificationService)
+            AppDbContext context,
+            IMapper mapper,
+            INotificationService notificationService)
         {
             _context = context;
             _mapper = mapper;
@@ -29,8 +30,8 @@ namespace RepairCenter.Services.RequestNotes
         }
 
         public async Task AddNoteAsync(
-     AddRequestNoteDto dto,
-     string userId)
+            AddRequestNoteDto dto,
+            string userId)
         {
             var request = await _context.ServiceRequests
                 .FirstOrDefaultAsync(x => x.Id == dto.RequestId);
@@ -38,29 +39,38 @@ namespace RepairCenter.Services.RequestNotes
             if (request == null)
                 throw new Exception("Request not found.");
 
+            // ============================================
+            // Specialist
+            // ============================================
             // لو الطلب لسه مفيش له Specialist
-            // نربطه بأول موظف كتب Note
+            // نربطه بأول Specialist كتب Note
             if (string.IsNullOrEmpty(request.SpecialistId))
             {
                 request.SpecialistId = userId;
             }
 
-            // لو الـ Note جاية معاها Status
+            // ============================================
+            // Status
+            // ============================================
+
             if (dto.Status.HasValue)
             {
                 if (dto.Status != RequestStatus.WaitingCustomerApproval &&
                     dto.Status != RequestStatus.InProgress &&
                     dto.Status != RequestStatus.Completed &&
-                    dto.Status != RequestStatus.CancelledByCustomer)
+                    dto.Status != RequestStatus.CancelledByCustomer &&
+                    dto.Status != RequestStatus.RepricingRequested)
                 {
                     throw new Exception("Invalid Status.");
                 }
 
-                // تحديث حالة الطلب
                 request.Status = dto.Status.Value;
             }
 
-            // إنشاء الـ Note
+            // ============================================
+            // Create Note
+            // ============================================
+
             var note = _mapper.Map<RequestNote>(dto);
 
             note.CreatedById = userId;
@@ -69,9 +79,9 @@ namespace RepairCenter.Services.RequestNotes
 
             await _context.SaveChangesAsync();
 
-            // ============================
+            // ============================================
             // Notifications
-            // ============================
+            // ============================================
 
             // Note فقط بدون تغيير Status
             if (!dto.Status.HasValue)
@@ -84,7 +94,10 @@ namespace RepairCenter.Services.RequestNotes
                 return;
             }
 
-            // Status اتغير
+            // ============================================
+            // Status Notifications
+            // ============================================
+
             switch (dto.Status.Value)
             {
                 case RequestStatus.InProgress:
@@ -96,6 +109,7 @@ namespace RepairCenter.Services.RequestNotes
 
                     break;
 
+
                 case RequestStatus.CancelledByCustomer:
 
                     await _notificationService.CreateForAllEmployeesAsync(
@@ -104,6 +118,7 @@ namespace RepairCenter.Services.RequestNotes
                         request.RequestNumber);
 
                     break;
+
 
                 case RequestStatus.Completed:
 
@@ -114,11 +129,23 @@ namespace RepairCenter.Services.RequestNotes
                         includeReceptionist: true);
 
                     break;
+
+
+                case RequestStatus.RepricingRequested:
+
+                    // Specialist طلب إعادة التسعير
+                    // Admin + Specialist هيعرفوا إن الطلب اتحدث
+                    await _notificationService.CreateForAllEmployeesAsync(
+                        NotificationType.RequestUpdated,
+                        request.Id,
+                        request.RequestNumber);
+
+                    break;
             }
         }
 
 
-
+        // ============================================
         // GET NOTES FOR REQUEST
         // ============================================
 
@@ -134,4 +161,5 @@ namespace RepairCenter.Services.RequestNotes
             return _mapper.Map<List<RequestNoteDto>>(notes);
         }
     }
- }
+}
+

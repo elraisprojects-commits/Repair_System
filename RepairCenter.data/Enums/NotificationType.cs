@@ -29,7 +29,9 @@ namespace RepairCenter.data.Enums
         RequestDelivered,
 
 
-        Repricing
+        Repricing,
+
+        RepricingRequested
 
 
     }

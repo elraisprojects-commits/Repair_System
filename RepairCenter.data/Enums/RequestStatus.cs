@@ -19,7 +19,8 @@ namespace RepairCenter.data.Enums
         Delivered,                           //تم الاستلام 
         CancelledByCustomer,                 //تم الرفض من العميل 
 
-        Repricing                           //اعاده التسعير by admin
+      //  Repricing,                           //اعاده التسعير by admin
+        RepricingRequested                    //اعاده التسعير by Specialist
     }
 }
 
